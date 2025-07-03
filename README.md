@@ -1,73 +1,83 @@
-# Welcome to your Lovable project
+# 🌊 루틴과 말하기 - AI 루틴 코치
 
-## Project info
+> **AI와 함께 실패 없는 루틴을 만들어가는 감정 기반 루틴 코치 앱**  
+> 감정과 실행 데이터를 기반으로, AI가 루틴 실패 원인을 분석하고 지속 가능한 루틴을 제안합니다.
 
-**URL**: https://lovable.dev/projects/3dab8782-cc95-4deb-ada5-74bbaa9d586b
+---
 
-## How can I edit this code?
+## 🔗 배포 URL
 
-There are several ways of editing your application.
+👉 [루틴과 말하기 웹 앱 바로가기](https://routine-ai-coach.lovable.app/)
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3dab8782-cc95-4deb-ada5-74bbaa9d586b) and start prompting.
+## 🎯 서비스 개요
 
-Changes made via Lovable will be committed automatically to this repo.
+- **서비스명**: 루틴과 말하기  
+- **핵심 가치**:  
+  - 단순 체크가 아닌 *실패 원인 분석* 중심 루틴 관리  
+  - 감정 기반 *AI 회고 피드백* 제공  
+  - 개인화된 루틴 조정 및 *유지 전략* 제공
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 👤 페르소나
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 1. **Mint / 2N세 / 개발자 지망생 
+| 항목 | 내용 |
+|------|------|
+| 성격 | 꾸준히 해보려 하지만 계획 실패가 잦고 감정에 영향을 많이 받음 |
+| 고민 | “루틴을 자꾸 실패하고, 이유도 모르겠고… 점점 자신감이 떨어져요” |
+| 목표 | 내 감정과 현실을 고려한 지속 가능한 루틴을 만들고 싶다 |
+| 니즈 | 실패해도 괜찮은 루틴, 감정 기반 피드백, 나에게 맞춘 루틴 추천 |
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🧭 사용자 스토리
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 🎯 "실패를 피드백 삼아, 다시 시작하고 싶어요"
 
-# Step 3: Install the necessary dependencies.
-npm i
+Mint는 매일 루틴 앱에 체크하지만, 며칠만 지나면 루틴이 무너진다.
+어느 날, ‘루틴과 말하기’를 시작하며 AI에게 물었다.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+“왜 이렇게 루틴이 안 지켜질까요?”
 
-**Edit a file directly in GitHub**
+AI는 소감에서 자주 등장한 단어 ‘피곤’, ‘야근’을 분석해
+Mint의 루틴 시간대를 아침으로 바꾸자고 제안했다.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+그날 이후, Mint는 더 짧고 간단한 루틴으로 다시 시작했고,
+실패하더라도 AI가 “괜찮아요, 다음엔 더 쉽게 시작해봐요”라며 위로해줬다.
 
-**Use GitHub Codespaces**
+루틴은 더 이상 자책의 증거가 아니었다.
+이제는 감정을 다독이며 계속 걸어가는 작은 길이 되었다.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 🔧 주요 기능 요약
 
-This project is built with:
+- ✅ **루틴 생성/체크**: 요일, 시간대, 성공 조건 등 상세 설정 가능
+- 💬 **감정 기반 회고**: 표정 선택 + 간단 소감 → AI 자동 분석
+- 🧠 **AI 피드백**: 실패 원인 분석 → 대체 루틴 제안 + 현실적인 코칭
+- 📊 **루틴 회고 시각화**: 달력, 성공률 그래프, 실패 요인 빈도 표시
+- 🎖 **뱃지 & 레벨 시스템**: 연속 성공, 회고 작성 등 성취 기반 동기 부여
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## 🌱 철학
 
-Simply open [Lovable](https://lovable.dev/projects/3dab8782-cc95-4deb-ada5-74bbaa9d586b) and click on Share -> Publish.
+> **"루틴은 인간적인 실수와 감정을 품어야 진짜 루틴이 된다."**
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 🛠 기술 스택
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- **프론트엔드**: React + TailwindCSS + Chart.js
+- **백엔드**: Spring Boot REST API
+- **AI 코칭**: GPT / Gemini API 선택 연동
+- **배포**: Lovable AI 프로토타이핑 툴 기반
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+
+## 📩 문의 및 제안
+
+- 기능 제안/피드백은 이슈 또는 피드백 폼으로 전달해주세요 🙌
