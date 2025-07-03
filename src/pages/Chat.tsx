@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Lightbulb } from 'lucide-react';
@@ -6,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import WaveAnimation from '@/components/WaveAnimation';
 import ApiKeySetup from '@/components/ApiKeySetup';
+import { toast } from 'sonner';
 
 interface Message {
   id: number;
@@ -53,44 +53,102 @@ const Chat = () => {
     }
 
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+      console.log('API 호출 시작:', { userMessage, apiKeyLength: apiKey.length });
+      
+      const requestBody = {
+        contents: [{
+          parts: [{
+            text: `당신은 친근하고 공감적인 루틴 코치입니다. 사용자의 루틴 관리를 도와주세요. 
+            
+사용자 메시지: ${userMessage}
+
+한국어로 따뜻하고 격려하는 톤으로 답변해주세요. 구체적이고 실용적인 조언을 포함해주세요.`
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        },
+        safetySettings: [
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          }
+        ]
+      };
+
+      console.log('요청 본문:', JSON.stringify(requestBody, null, 2));
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `당신은 친근하고 공감적인 루틴 코치입니다. 사용자의 루틴 관리를 도와주세요. 
-              
-사용자 메시지: ${userMessage}
-
-한국어로 따뜻하고 격려하는 톤으로 답변해주세요. 구체적이고 실용적인 조언을 포함해주세요.`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 1,
-            topP: 1,
-            maxOutputTokens: 2048,
-          },
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log('응답 상태:', response.status, response.statusText);
+
       if (!response.ok) {
-        throw new Error(`API 호출 실패: ${response.status}`);
+        const errorText = await response.text();
+        console.error('API 오류 응답:', errorText);
+        
+        let errorMessage = "API 호출에 실패했습니다.";
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          if (errorData.error?.message) {
+            errorMessage = errorData.error.message;
+          }
+        } catch (e) {
+          console.error('오류 응답 파싱 실패:', e);
+        }
+
+        if (response.status === 400) {
+          errorMessage = "잘못된 요청입니다. API 키를 다시 확인해주세요.";
+        } else if (response.status === 403) {
+          errorMessage = "API 키가 유효하지 않거나 권한이 없습니다.";
+        } else if (response.status === 429) {
+          errorMessage = "API 호출 한도를 초과했습니다. 잠시 후 다시 시도해주세요.";
+        }
+
+        toast.error(errorMessage);
+        throw new Error(`API 호출 실패: ${response.status} - ${errorMessage}`);
       }
 
       const data = await response.json();
+      console.log('API 응답 데이터:', JSON.stringify(data, null, 2));
       
       if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-        return data.candidates[0].content.parts[0].text;
+        const responseText = data.candidates[0].content.parts[0].text;
+        console.log('AI 응답 텍스트:', responseText);
+        return responseText;
       } else {
+        console.error('예상치 못한 응답 구조:', data);
         throw new Error('API 응답 형식이 예상과 다릅니다.');
       }
     } catch (error) {
-      console.error('Gemini API 호출 중 오류:', error);
-      return "죄송합니다. 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+      console.error('Gemini API 호출 중 상세 오류:', error);
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return "네트워크 연결을 확인해주세요.";
+      }
+      
+      return "죄송합니다. AI 서비스 연결에 문제가 발생했습니다. API 키를 확인하거나 잠시 후 다시 시도해주세요.";
     }
   };
 
@@ -105,11 +163,12 @@ const Chat = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputValue;
     setInputValue('');
     setIsTyping(true);
 
     try {
-      const aiResponse = await callGeminiAPI(inputValue);
+      const aiResponse = await callGeminiAPI(currentInput);
       
       const aiMessage: Message = {
         id: messages.length + 2,
@@ -121,6 +180,7 @@ const Chat = () => {
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       console.error('메시지 전송 중 오류:', error);
+      toast.error('메시지 전송에 실패했습니다.');
     } finally {
       setIsTyping(false);
     }
@@ -133,6 +193,7 @@ const Chat = () => {
   const handleApiKeySet = (newApiKey: string) => {
     setApiKey(newApiKey);
     setShowApiKeySetup(false);
+    toast.success('API 키가 성공적으로 설정되었습니다!');
   };
 
   return (
