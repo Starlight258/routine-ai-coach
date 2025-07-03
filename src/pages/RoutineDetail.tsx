@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, X, Heart, Save } from 'lucide-react';
+import { ArrowLeft, Check, X, Heart, Save, BarChart3, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import WaveAnimation from '@/components/WaveAnimation';
@@ -259,11 +258,21 @@ const RoutineDetail = () => {
 
         {/* Quick Actions */}
         <div className="flex gap-3">
-          <Button variant="outline" className="flex-1">
-            루틴 수정
-          </Button>
-          <Button variant="outline" className="flex-1">
+          <Button 
+            variant="outline" 
+            className="flex-1"
+            onClick={() => navigate('/stats')}
+          >
+            <BarChart3 className="h-4 w-4 mr-2" />
             통계 보기
+          </Button>
+          <Button 
+            variant="outline" 
+            className="flex-1"
+            onClick={() => navigate('/chat')}
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            AI 상담
           </Button>
         </div>
       </div>
