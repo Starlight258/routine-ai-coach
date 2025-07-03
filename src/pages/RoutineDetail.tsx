@@ -1,10 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, X, Heart } from 'lucide-react';
+import { ArrowLeft, Check, X, Heart, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import WaveAnimation from '@/components/WaveAnimation';
+import { toast } from 'sonner';
 
 const mockRoutine = {
   id: 1,
@@ -25,15 +26,56 @@ const moodEmojis = [
 const RoutineDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isCompleted, setIsCompleted] = useState(false);
+  const [isCompleted, setIsCompleted] = useState<boolean | null>(null);
   const [mood, setMood] = useState('');
   const [reflection, setReflection] = useState('');
   const [aiResponse, setAiResponse] = useState('');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // 자동 저장 함수
+  const autoSave = () => {
+    if (isCompleted !== null || mood || reflection) {
+      // 여기서 실제로는 API 호출을 통해 서버에 저장
+      localStorage.setItem(`routine_${id}_check`, JSON.stringify({
+        completed: isCompleted,
+        mood,
+        reflection,
+        date: new Date().toDateString()
+      }));
+      setHasUnsavedChanges(false);
+      toast.success('자동으로 저장되었습니다!');
+    }
+  };
+
+  // 데이터가 변경될 때마다 자동 저장 (1초 후)
+  useEffect(() => {
+    if (hasUnsavedChanges) {
+      const timer = setTimeout(() => {
+        autoSave();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasUnsavedChanges, isCompleted, mood, reflection]);
+
+  // 컴포넌트 마운트 시 저장된 데이터 불러오기
+  useEffect(() => {
+    const savedData = localStorage.getItem(`routine_${id}_check`);
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      if (parsed.date === new Date().toDateString()) {
+        setIsCompleted(parsed.completed);
+        setMood(parsed.mood);
+        setReflection(parsed.reflection);
+      }
+    }
+  }, [id]);
 
   const handleComplete = (completed: boolean) => {
     setIsCompleted(completed);
+    setHasUnsavedChanges(true);
+    
+    // AI 응답 생성
     if (completed && mood && reflection) {
-      // Simulate AI response
       setTimeout(() => {
         setAiResponse(
           mood === 'good' 
@@ -42,8 +84,22 @@ const RoutineDetail = () => {
             ? "오늘도 루틴을 지키신 것만으로도 충분합니다! 💪 조금씩 개선해나가면 돼요."
             : "힘든 상황에서도 도전하신 것이 대단해요. 🌟 내일은 조금 더 수월할 거예요. 루틴 시간을 조정해볼까요?"
         );
-      }, 1000);
+      }, 500);
     }
+  };
+
+  const handleMoodChange = (selectedMood: string) => {
+    setMood(selectedMood);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleReflectionChange = (value: string) => {
+    setReflection(value);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleManualSave = () => {
+    autoSave();
   };
 
   return (
@@ -68,6 +124,12 @@ const RoutineDetail = () => {
             />
             <h1 className="text-2xl font-bold text-gray-800">{mockRoutine.name}</h1>
           </div>
+          {hasUnsavedChanges && (
+            <div className="flex items-center gap-2 text-orange-600 text-sm">
+              <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
+              저장 중...
+            </div>
+          )}
         </div>
 
         {/* Routine Info */}
@@ -101,7 +163,19 @@ const RoutineDetail = () => {
 
         {/* Today's Check */}
         <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg mb-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">오늘의 체크 📅</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">오늘의 체크 📅</h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleManualSave}
+              disabled={!hasUnsavedChanges}
+              className="text-xs"
+            >
+              <Save className="h-3 w-3 mr-1" />
+              저장
+            </Button>
+          </div>
           
           {/* Completion Buttons */}
           <div className="flex gap-4 mb-6">
@@ -118,11 +192,11 @@ const RoutineDetail = () => {
               완료했어요
             </Button>
             <Button
-              variant={!isCompleted && isCompleted !== null ? 'default' : 'outline'}
+              variant={isCompleted === false ? 'default' : 'outline'}
               onClick={() => handleComplete(false)}
               className="flex-1 h-12 text-lg"
               style={{ 
-                backgroundColor: !isCompleted && isCompleted !== null ? '#EF4444' : 'transparent',
+                backgroundColor: isCompleted === false ? '#EF4444' : 'transparent',
                 borderColor: '#EF4444'
               }}
             >
@@ -138,7 +212,7 @@ const RoutineDetail = () => {
               {moodEmojis.map((moodOption) => (
                 <button
                   key={moodOption.value}
-                  onClick={() => setMood(moodOption.value)}
+                  onClick={() => handleMoodChange(moodOption.value)}
                   className={`p-4 rounded-xl transition-all ${
                     mood === moodOption.value 
                       ? 'bg-blue-100 ring-2 ring-blue-400' 
@@ -156,12 +230,15 @@ const RoutineDetail = () => {
           <div className="mb-4">
             <p className="text-gray-700 font-medium mb-2">간단한 소감이나 어려웠던 점이 있다면?</p>
             <Textarea
-              placeholder="예: 피곤해서 힘들었지만 그래도 해냈어요!"
+              placeholder="예: 피곤해서 힘들었지만 그래도 해냈어요! (자동으로 저장됩니다)"
               value={reflection}
-              onChange={(e) => setReflection(e.target.value)}
+              onChange={(e) => handleReflectionChange(e.target.value)}
               className="bg-white/70"
               rows={3}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              입력하신 내용은 1초 후 자동으로 저장됩니다.
+            </p>
           </div>
 
           {/* AI Response */}
