@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Calendar, BarChart3, Settings, MessageCircle } from 'lucide-react';
+import { Plus, Calendar, BarChart3, Settings, MessageCircle, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import RoutineCard from '@/components/RoutineCard';
 import WaveAnimation from '@/components/WaveAnimation';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const mockRoutines = [
   {
@@ -59,7 +59,7 @@ const Dashboard = () => {
   const totalCount = routines.length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
       {/* Wave Animation Background */}
       <WaveAnimation />
       
@@ -67,19 +67,30 @@ const Dashboard = () => {
       <div className="relative z-10 px-6 pt-12 pb-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">오늘의 루틴들 🏄‍♀️</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">오늘의 루틴들 🏄‍♀️</h1>
+            <p className="text-gray-600 dark:text-gray-300">
               {completedCount}/{totalCount} 완료 • 오늘도 파도를 타보자!
             </p>
           </div>
           <div className="flex gap-2">
+            <ThemeToggle />
+            <Link to="/calendar">
+              <Button variant="ghost" size="icon" className="rounded-full bg-white/50 dark:bg-gray-800/50">
+                <Calendar className="h-5 w-5" />
+              </Button>
+            </Link>
+            <Link to="/badges">
+              <Button variant="ghost" size="icon" className="rounded-full bg-white/50 dark:bg-gray-800/50">
+                <Award className="h-5 w-5" />
+              </Button>
+            </Link>
             <Link to="/stats">
-              <Button variant="ghost" size="icon" className="rounded-full bg-white/50">
+              <Button variant="ghost" size="icon" className="rounded-full bg-white/50 dark:bg-gray-800/50">
                 <BarChart3 className="h-5 w-5" />
               </Button>
             </Link>
             <Link to="/chat">
-              <Button variant="ghost" size="icon" className="rounded-full bg-white/50">
+              <Button variant="ghost" size="icon" className="rounded-full bg-white/50 dark:bg-gray-800/50">
                 <MessageCircle className="h-5 w-5" />
               </Button>
             </Link>
@@ -87,7 +98,7 @@ const Dashboard = () => {
         </div>
 
         {/* Progress Bar */}
-        <div className="bg-white/60 rounded-full h-3 mb-8 overflow-hidden">
+        <div className="bg-white/60 dark:bg-gray-800/60 rounded-full h-3 mb-8 overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-blue-400 to-teal-400 transition-all duration-300 rounded-full"
             style={{ width: `${(completedCount / totalCount) * 100}%` }}
@@ -107,12 +118,14 @@ const Dashboard = () => {
       </div>
 
       {/* Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200/50 px-6 py-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-t border-gray-200/50 dark:border-gray-700/50 px-6 py-4">
         <div className="flex justify-around items-center">
-          <Button variant="ghost" size="sm" className="flex flex-col gap-1">
-            <Calendar className="h-5 w-5" />
-            <span className="text-xs">달력</span>
-          </Button>
+          <Link to="/calendar">
+            <Button variant="ghost" size="sm" className="flex flex-col gap-1">
+              <Calendar className="h-5 w-5" />
+              <span className="text-xs">달력</span>
+            </Button>
+          </Link>
           
           <Link to="/create">
             <Button className="bg-gradient-to-r from-orange-400 to-pink-400 hover:from-orange-500 hover:to-pink-500 rounded-full h-14 w-14 shadow-lg">
