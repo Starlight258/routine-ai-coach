@@ -13,7 +13,7 @@ const mockRoutines = [
     color: '#FF6B8A',
     timeSlot: '오전',
     successCriteria: '30분 이상',
-    status: 'success', // success, failed, pending
+    status: 'success' as const,
     completedToday: true,
     streak: 5,
     weekdays: ['월', '화', '수', '목', '금']
@@ -24,7 +24,7 @@ const mockRoutines = [
     color: '#4ECDC4',
     timeSlot: '오후',
     successCriteria: '1시간 이상',
-    status: 'pending',
+    status: 'pending' as const,
     completedToday: false,
     streak: 3,
     weekdays: ['월', '수', '금']
@@ -35,7 +35,7 @@ const mockRoutines = [
     color: '#45B7D1',
     timeSlot: '밤',
     successCriteria: '10분 이상',
-    status: 'failed',
+    status: 'failed' as const,
     completedToday: false,
     streak: 0,
     weekdays: ['매일']
